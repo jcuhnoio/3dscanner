@@ -3,6 +3,9 @@ import numpy as np
 import serial
 from scipy.optimize import curve_fit
 from mpl_toolkits.mplot3d import Axes3D
+import warnings
+
+warnings.filterwarnings('ignore')
 
 calibrationplot = [[15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100, 110, 120],
                    [519, 475, 430, 380, 340, 300, 270, 240, 220, 195, 180, 160, 150, 145, 130, 120, 110, 100, 90]]
@@ -12,12 +15,19 @@ calibrationplot = [[15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 
 def func(x, a, b, c): # Define function shape to fit to
     return a * np.exp(-b * np.array(x)) + c
 
+
+def getDist(x, a, b, c): # Curve + initial linear growth
+    if x < 15:
+        return 30*x
+    return a * np.exp(-b * np.array(x)) + c
+
 popt = curve_fit(func, calibrationplot[0], calibrationplot[1]) # Fit curve to calibration plot
 popt = list(popt)
 
-# func(x, *list(popt[0]))
+port = 'COM4' # For windows
+# port = '/dev/tty.usbmodem21401' # For MAC
 
-serialPort = serial.Serial(port = '/dev/tty.usbmodem21401', baudrate = 9600, timeout=1)
+serialPort = serial.Serial(port = port, baudrate = 9600, timeout=1)
 
 scanArray = []
 scanning = True
@@ -27,19 +37,26 @@ while scanning == True:
     scanArrayRow = []
     i = 0
     while i < scanpoints:
-        data = serialPort.readline().decode()
-        if data == 'Scan complete\r\n':
-            # print(data)
-            scanning = False
-        elif len(data) > 0 and data != '\n':
-            data = int(data)
-            
-            scanArrayRow.append(func(data,*list(popt[0])))
-        elif len(data) == 0:
-           # print(type(data))
-            i = i - 1
+        data = serialPort.readline().decode().rstrip("\r\n")
+        if len(data) > 0:
+            if data == 'Scan complete':
+                # print(data)
+                scanning = False
+            # elif len(data) > 0 and data != '\n':
+            #     data = int(data)
+                
+            #     scanArrayRow.append(func(data,*list(popt[0])))
+            # elif len(data) == 0:
+            #    # print(type(data))
+            #     i = i - 1
+            else:
+                try:
+                    scanArrayRow.append(func(int(data),*list(popt[0])))
+                except ValueError:
+                    i -= 1
+        else:
+            i -= 1
         i += 1
-
     scanArray.append(scanArrayRow)
 
 print(scanArray)
@@ -54,7 +71,7 @@ for i, row in enumerate(scanArray):
 print(scanArray)
 
 phi = [ang for ang in range(45,-46,-1)]
-theta = [ang for ang in range(60,-21,-1)]
+theta = [ang for ang in range(30,-21,-1)]
 
 def sph2car(phi,theta,r):
     x = np.cos(np.deg2rad(phi))*r
