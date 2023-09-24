@@ -7,32 +7,27 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-calibrationplot = [[15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100, 110, 120],
-                   [519, 475, 430, 380, 340, 300, 270, 240, 220, 195, 180, 160, 150, 145, 130, 120, 110, 100, 90]]
+# Sensor reading vs. Distance
+calibrationplot = [[90,100,110,120,130,145,150,160,180,195,220,240,270,300,340,380,430,475,519],
+                    [120,110,100,90,85,80,75,70,65,60,55,50,45,40,35,30,25,20,15]]
 
+x = calibrationplot[0]
+y = calibrationplot[1]
 
-
-def func(x, a, b, c): # Define function shape to fit to
-    return a * np.exp(-b * np.array(x)) + c
-
-
-def getDist(x, a, b, c): # Curve + initial linear growth
-    if x < 15:
-        return 30*x
-    return a * np.exp(-b * np.array(x)) + c
-
-popt = curve_fit(func, calibrationplot[0], calibrationplot[1]) # Fit curve to calibration plot
-popt = list(popt)
+sensor2dist =  np.poly1d(np.polyfit(x, y,3)) # Fit curve to calibration plot
 
 port = 'COM4' # For windows
 # port = '/dev/tty.usbmodem21401' # For MAC
 
+# Connect to Arduino
 serialPort = serial.Serial(port = port, baudrate = 9600, timeout=1)
 
 scanArray = []
 scanning = True
 scanpoints = 90 # Number of scans per sweep
 
+
+print("Scanning in progress")
 while scanning == True:
     scanArrayRow = []
     i = 0
@@ -51,7 +46,7 @@ while scanning == True:
             #     i = i - 1
             else:
                 try:
-                    scanArrayRow.append(func(int(data),*list(popt[0])))
+                    scanArrayRow.append(round(sensor2dist(int(data)),4))
                 except ValueError:
                     i -= 1
         else:
@@ -59,8 +54,7 @@ while scanning == True:
         i += 1
     scanArray.append(scanArrayRow)
 
-print(scanArray)
-
+# Last array ends up being [], remove it from dataset
 scanArray.pop(-1)
 
 # Flip rows where scanner is sweeping the opposite direction (every other row)
@@ -68,36 +62,6 @@ for i, row in enumerate(scanArray):
     if i%2 == 1:
         scanArray[i].reverse()
 
-print(scanArray)
-
-phi = [ang for ang in range(45,-46,-1)]
-theta = [ang for ang in range(30,-21,-1)]
-
-def sph2car(phi,theta,r):
-    x = np.cos(np.deg2rad(phi))*r
-    y = np.sin(np.deg2rad(phi))*r
-    z = np.sin(np.deg2rad(theta))*r
-    return (x,y,z)
-
-xmat = []
-ymat = []
-zmat = []
-
-for rowIndex, row in enumerate(scanArray):
-    currentTheta = theta[rowIndex]
-    for columnIndex, value in enumerate(row):
-        currentPhi = phi[columnIndex]
-        x,y,z = sph2car(currentPhi,currentTheta,value)
-        xmat.append(x)
-        ymat.append(y)
-        zmat.append(z)
-
-
-    
-fig=plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(ymat,xmat,zmat,s=1)
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-plt.show()
+f = open("3dscanner/data.txt", "w")
+f.write(str(scanArray))
+f.close()
