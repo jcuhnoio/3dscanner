@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-f = open("3dscanner\data.txt", "r")
+f = open("/Users/juno/Documents/PIE/3dscanner/data.txt", "r")
 lst = f.read()
 scanArray = json.loads(lst)[0:51]
 
-phi = [np.deg2rad(ang) for ang in range(45,-46,-1)]
+phi = [np.deg2rad(ang) for ang in range(30,-31,-1)]
 theta = [np.deg2rad(90-ang) for ang in range(30,-21,-1)]
 
 print(len(phi),len(theta),len(scanArray))
@@ -33,7 +33,7 @@ for rowIndex, row in enumerate(scanArray):
 
 fig=plt.figure()
 ax = plt.axes(projection='3d')
-ax.scatter(xmat,ymat,zmat,s=1)
+ax.scatter(xmat,ymat,zmat, c = xmat, s=1, cmap = 'BuPu')
 
 ax.set_xlim(-200,200)
 ax.set_ylim(-200,200)

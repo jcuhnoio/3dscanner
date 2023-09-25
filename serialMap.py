@@ -16,15 +16,15 @@ y = calibrationplot[1]
 
 sensor2dist =  np.poly1d(np.polyfit(x, y,3)) # Fit curve to calibration plot
 
-port = 'COM4' # For windows
-# port = '/dev/tty.usbmodem21401' # For MAC
+# port = 'COM4' # For windows
+port = '/dev/tty.usbmodem21301' # For MAC
 
 # Connect to Arduino
 serialPort = serial.Serial(port = port, baudrate = 9600, timeout=1)
 
 scanArray = []
 scanning = True
-scanpoints = 90 # Number of scans per sweep
+scanpoints = 60 # Number of scans per sweep
 
 
 print("Scanning in progress")
@@ -46,6 +46,10 @@ while scanning == True:
             #     i = i - 1
             else:
                 try:
+                    if int(data) < 90:
+                        data = 90
+                    elif int(data) > 519:
+                        data = 519
                     scanArrayRow.append(round(sensor2dist(int(data)),4))
                 except ValueError:
                     i -= 1
@@ -62,6 +66,6 @@ for i, row in enumerate(scanArray):
     if i%2 == 1:
         scanArray[i].reverse()
 
-f = open("3dscanner/data.txt", "w")
+f = open("/Users/juno/Documents/PIE/3dscanner/data.txt", "w")
 f.write(str(scanArray))
 f.close()
