@@ -8,7 +8,7 @@ Second project of `Principles of Integated Engineering.` The goal is to make a p
 
 ## Project Demo
 <img src="images/X_original.jpg" alt="scan" width="250"/>
-<img src="images/X.png" alt="plot" width="350"/>  
+<img src="images/X.png" alt="plot" width="300"/>  
 
 ***Left** : Object scanned in real life. **Right**: 3D visualization of sensor data*
 
