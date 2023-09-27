@@ -33,7 +33,7 @@ for rowIndex, row in enumerate(scanArray):
 
 fig=plt.figure()
 ax = plt.axes(projection='3d')
-ax.scatter(xmat,ymat,zmat, c = xmat, s=1, cmap = 'BuPu')
+ax.scatter(xmat,ymat,zmat, c = xmat, s=1, cmap = 'ocean')
 
 ax.set_xlim(-200,200)
 ax.set_ylim(-200,200)

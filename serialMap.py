@@ -63,7 +63,7 @@ scanArray.pop(-1)
 
 # Flip rows where scanner is sweeping the opposite direction (every other row)
 for i, row in enumerate(scanArray):
-    if i%2 == 1:
+    if i%2 == 0:
         scanArray[i].reverse()
 
 f = open("/Users/juno/Documents/PIE/3dscanner/data.txt", "w")
