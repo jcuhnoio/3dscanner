@@ -7,8 +7,10 @@ Mechanical design by: Satchel Schiavo
 Second project of `Principles of Integated Engineering.` The goal is to make a pan-and-tilt mechanism using 2 servos that are controlled by an Arduino. There is also an [infrared distance sensor](https://pdf1.alldatasheet.com/datasheet-pdf/view/412633/SHARP/GP2Y0A02YK0F.html) used for gathering distance information. Then, the scanned environment is visualized in 3D.
 
 ## Project Demo
+<p float='left'>
 <img src="images/X_original.jpg" alt="scan" width="250"/>
 <img src="images/X.png" alt="plot" width="300"/>  
+</p>
 
 ***Left** : Object scanned in real life. **Right**: 3D visualization of sensor data*
 
