@@ -1,11 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import serial
-from scipy.optimize import curve_fit
 from mpl_toolkits.mplot3d import Axes3D
-import warnings
-
-warnings.filterwarnings('ignore')
 
 # Sensor reading vs. Distance
 calibrationplot = [[90,100,110,120,130,145,150,160,180,195,220,240,270,300,340,380,430,475,519],
@@ -35,17 +31,10 @@ while scanning == True:
         data = serialPort.readline().decode().rstrip("\r\n")
         if len(data) > 0:
             if data == 'Scan complete':
-                # print(data)
                 scanning = False
-            # elif len(data) > 0 and data != '\n':
-            #     data = int(data)
-                
-            #     scanArrayRow.append(func(data,*list(popt[0])))
-            # elif len(data) == 0:
-            #    # print(type(data))
-            #     i = i - 1
             else:
                 try:
+                    # Min/Max distance
                     if int(data) < 90:
                         data = 90
                     elif int(data) > 519:
@@ -66,6 +55,8 @@ for i, row in enumerate(scanArray):
     if i%2 == 0:
         scanArray[i].reverse()
 
-f = open("/Users/juno/Documents/PIE/3dscanner/data.txt", "w")
+# Save scanned points to external file
+# f = open("/Users/juno/Documents/PIE/3dscanner/data.txt", "w")
+f = open("3dscanner/data.txt","w")
 f.write(str(scanArray))
 f.close()
